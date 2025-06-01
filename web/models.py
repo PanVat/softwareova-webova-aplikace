@@ -1,22 +1,23 @@
 from django.db import models
-from multiselectfield import MultiSelectField
-from . import moznosti  # Importuje možnosti volby
+from . import seznamy_software as sez_soft  # Import modulu, který obsahuje více možností pro tabulku 'Software'
+from . import seznamy_verze as sez_ver  # Import modulu, který obsahuje více možností pro tabulku 'Verze'
 
 
 # Třída pro ukládání dat jednotlivých programů
 class Software(models.Model):
     nazev = models.CharField(max_length=100, verbose_name='Název', help_text='Zadejte název programu',
                              error_messages={'blank': 'Název nemůže být prázdný'})
-    kategorie = MultiSelectField(choices=moznosti.KATEGORIE, verbose_name='Kategorie', blank=True, null=True)
+    kategorie = models.ManyToManyField(sez_soft.Kategorie, verbose_name='Kategorie',
+                                       help_text='Zadejte název kategorie')
     vydani = models.DateField(verbose_name='Datum vydání', blank=True, null=True)
-    licence = MultiSelectField(choices=moznosti.LICENCE, verbose_name='Licence', blank=True, null=True)
+    licence = models.ManyToManyField(sez_soft.Licence, verbose_name='Licence', help_text='Zadejte název licence')
     cena = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Cena (Kč)', blank=True, null=True, )
-    jazyk = MultiSelectField(choices=moznosti.JAZYK, verbose_name='Jazyk', blank=True, null=True)
-    platforma = MultiSelectField(choices=moznosti.PLATFORMA, verbose_name='Platforma', blank=True, null=True)
+    jazyk = models.ManyToManyField(sez_soft.Jazyk, verbose_name='Jazyk', help_text='Zadejte jazyk programu')
+    platforma = models.ManyToManyField(sez_soft.Platforma, verbose_name='Platforma',
+                                       help_text='Zadejte název platformy')
     popis = models.TextField(verbose_name='Popis', help_text='Stručně popište program', blank=True, null=True)
     ikona = models.ImageField(upload_to='ikony', verbose_name='Ikona', blank=True, null=True)
-    # Cizí klíč na vývojáře
-    vyvojar = models.ForeignKey('Vyvojar', on_delete=models.CASCADE, verbose_name='Vývojář', blank=True, null=True)
+    url = models.URLField(verbose_name='URL', help_text='Zadejte URL adresu programu', blank=True, null=True)
 
     # Třída pro metadata
     class Meta:
@@ -29,26 +30,25 @@ class Software(models.Model):
         return self.nazev
 
 
-# Třída pro ukládání dat jednotlivých vývojářů programů
-class Vyvojar(models.Model):
-    jmeno = models.CharField(max_length=50, verbose_name='Jméno', help_text='Zadejte jméno nebo přezdívku vývojáře',
-                             error_messages={'blank': 'Pole nemůže být prázdné'})
-    email = models.EmailField(verbose_name='E-mail', help_text='Zadejte e-mailovou adresu vývojáře')
-    web = models.URLField(verbose_name='Web', help_text='Zadejte URL adresu webové stránky vývojáře', blank=True,
-                          null=True)
-    informace = models.TextField(verbose_name='Informace', help_text='Zadejte informace o vývojáři', blank=True,
-                                 null=True)
-    profil = models.ImageField(upload_to='profily', verbose_name='Profilový obrázek', blank=True, null=True)
+# Třída pro ukládání systémových požadavků
+class SystemovePozadavky(models.Model):
+    program = models.ForeignKey('Software', on_delete=models.CASCADE, verbose_name='Program', blank=True, null=True)
+    cpu = models.CharField(max_length=100, verbose_name='Procesor', help_text='Procesor', blank=True, null=True)
+    gpu = models.CharField(max_length=100, verbose_name='Grafická karta', help_text='Grafická karta',
+                           blank=True, null=True)
+    vram = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Video paměť (GB)', blank=True, null=True)
+    ram = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='RAM (GB)', blank=True, null=True)
+    disk = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Disk (GB)', blank=True, null=True)
+    os = models.CharField(max_length=100, verbose_name='Operační systém', help_text='Operační systém',
+                          blank=True, null=True)
 
-    # Třída pro metadata
     class Meta:
-        verbose_name = 'Vývojář'
-        verbose_name_plural = 'Vývojáři'
-        ordering = ['jmeno']
+        verbose_name = 'Systémové požadavky'
+        verbose_name_plural = 'Systémové požadavky'
+        ordering = ['cpu']
 
-    # Textová reprezentace objektu
     def __str__(self):
-        return self.jmeno
+        return f"{self.cpu}, {self.gpu}, {self.ram}, {self.disk}, {self.os}"
 
 
 # Třída pro ukládání dat jednotlivých verzí programů
@@ -58,7 +58,7 @@ class Verze(models.Model):
     verze = models.CharField(max_length=30, verbose_name='Verze', help_text='Zadejte verzi programu',
                              error_messages={'blank': 'Pole nemůže být prázdné'})
     vydani = models.DateField(verbose_name='Datum vydání', blank=True, null=True)
-    typ = MultiSelectField(choices=moznosti.TYP, verbose_name='Typ verze', blank=True, null=True)
+    typ = models.ManyToManyField(sez_ver.Typ, verbose_name='Typ verze', help_text='Zadejte typ verze')
     popis = models.TextField(verbose_name='Popis', help_text='Zadejte popis verze', blank=True, null=True)
     velikost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Velikost (MB)', blank=True, null=True)
 
@@ -70,4 +70,4 @@ class Verze(models.Model):
 
     # Textová reprezentace objektu
     def __str__(self):
-        return f"{self.software.nazev} – {self.verze}"
+        return f"{self.software.nazev if self.software else ''} – {self.verze}"
