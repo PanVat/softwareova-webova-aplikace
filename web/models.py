@@ -3,7 +3,7 @@ from . import seznamy_software as sez_soft  # Import modulu, který obsahuje ví
 from . import seznamy_verze as sez_ver  # Import modulu, který obsahuje více možností pro tabulku 'Verze'
 
 
-# Třída pro ukládání dat jednotlivých programů
+## Třída pro ukládání záznamů o programech ##
 class Software(models.Model):
     nazev = models.CharField(max_length=100, verbose_name='Název', help_text='Zadejte název programu',
                              error_messages={'blank': 'Název nemůže být prázdný'})
@@ -30,7 +30,7 @@ class Software(models.Model):
         return self.nazev
 
 
-# Třída pro ukládání systémových požadavků
+## Třída pro ukládání systémových požadavků programu ##
 class SystemovePozadavky(models.Model):
     program = models.ForeignKey('Software', on_delete=models.CASCADE, verbose_name='Program', blank=True, null=True)
     cpu = models.CharField(max_length=100, verbose_name='Procesor', help_text='Procesor', blank=True, null=True)
@@ -42,16 +42,18 @@ class SystemovePozadavky(models.Model):
     os = models.CharField(max_length=100, verbose_name='Operační systém', help_text='Operační systém',
                           blank=True, null=True)
 
+    # Třída pro metadata
     class Meta:
         verbose_name = 'Systémové požadavky'
         verbose_name_plural = 'Systémové požadavky'
         ordering = ['cpu']
 
+    # Textová reprezentace objektu
     def __str__(self):
         return f"{self.cpu}, {self.gpu}, {self.ram}, {self.disk}, {self.os}"
 
 
-# Třída pro ukládání dat jednotlivých verzí programů
+## Třída pro uložení verze programu ##
 class Verze(models.Model):
     # Cizí klíč na program
     software = models.ForeignKey('Software', on_delete=models.CASCADE, verbose_name='Software', blank=True, null=True)

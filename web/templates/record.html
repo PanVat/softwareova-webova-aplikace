@@ -1,19 +1,23 @@
+<!-- Vypíše podrobnější informace o záznamu -->
 {% extends 'base.html' %}
 
 {% block content %}
     <div class="container my-4">
         <div class="card mx-auto" style="max-width: 500px;">
+            <!-- Zobrazí ikonku programu, pokud existuje -->
             {% if program.ikona %}
                 <img src="{{ program.ikona.url }}" class="card-img-top" alt="Ikonka {{ program.nazev }}"
                      style="width: 150px; height: 150px; object-fit: contain; margin: 2rem auto 0 auto; display: block;">
             {% endif %}
             <div class="card-body">
+                <!-- Zobrazí název programu -->
                 <h2 class="card-title">{{ program.nazev }}</h2>
                 <p><strong>Kategorie:</strong>
                     {% for kat in program.kategorie.all %}
                         {{ kat.nazev }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
+                <!-- Zobrazí podrobný popis programu, datum vydání a jeho licenci -->
                 <p><strong>Popis:</strong> {{ program.popis }}</p>
                 <p><strong>Datum vydání:</strong> {{ program.vydani }}</p>
                 <p><strong>Licence:</strong>
@@ -21,21 +25,37 @@
                         {{ lic.nazev }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
+                <!-- Zobrazí vlajku programu na základě jazyka, do kterého byl přeložen -->
                 <p><strong>Jazyk:</strong>
-                    {% for jaz in program.jazyk.all %}
-                        {% if jaz.vlajka %}
-                            <img src="{{ jaz.vlajka.url }}" alt="{{ jaz.nazev }}" title="{{ jaz.nazev }}"
+                    {% for jazyk in program.jazyk.all %}
+                        {% if jazyk.vlajka %}
+                            <img src="{{ jazyk.vlajka.url }}" alt="{{ jazyk.nazev }}" title="{{ jazyk.nazev }}"
                                  style="height: 24px; width: 36px; object-fit: contain; margin-right: 4px;">
                         {% endif %}
                     {% endfor %}
                 </p>
+                <!-- Zobrazí platformu, na které je program dostupný -->
                 <p><strong>Platforma:</strong>
                     {% for plat in program.platforma.all %}
                         {{ plat.nazev }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
+                <!-- Zobrazí cenu programu, pokud je placený -->
                 <p><strong>Cena:</strong> {{ program.cena|default:"0" }} Kč</p>
                 <p><strong>URL:</strong> <a href="{{ program.url }}" target="_blank">{{ program.url }}</a></p>
+                <!-- Tlačítka pro provádění akcí s programy -->
+                <div class="d-flex flex-row align-items-center justify-content-center mt-4 gap-2">
+                    <!-- Úprava existujícího záznamu -->
+                    <a href="{% url 'software_edit' program.pk %}" class="btn btn-success rounded-pill px-4">
+                        Upravit
+                    </a>
+                    <form method="post" action="{% url 'software_delete' program.pk %}"
+                          onsubmit="return confirm('Opravdu chcete tento záznam smazat?');" class="m-0">
+                        {% csrf_token %}
+                        <!-- Smazání existujícího záznamu -->
+                        <button type="submit" class="btn btn-danger rounded-pill px-4">Smazat</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

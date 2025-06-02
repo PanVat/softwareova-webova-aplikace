@@ -6,21 +6,19 @@
     <!-- Kvůli importování Bootstrapu -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
 <!-- Záhlaví stránky -->
 {% include 'page/header.html' %}
 <!-- Navigační lišta -->
 {% include 'page/navbar.html' %}
-
 <!-- OBSAH STRÁNKY -->
 <div class="container my-4">
     {% block content %}{% endblock %}
 </div>
-
 <!-- Zápatí stránky -->
 {% include 'page/footer.html' %}
-
 <!-- Bootstrap scripty -->
 <script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
 <script src="{% static 'bootstrap/popper.min.js' %}"></script>

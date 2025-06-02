@@ -1,24 +1,36 @@
+<!-- Hlavní stránka, na které se zobrazuje nejnovějších 8 záznamů -->
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="row">
-        {% for program in software %}
+<div class="row">
+<!-- Vykresli záznamy - název programu + ikonka -->
+    {% for program in software_list %}
         <div class="col-md-4 my-3">
-            <div class="card h-100">
-                <a href="{% url 'record' program.pk %}">
-                    {% if program.ikona %}
-                    <img src="{{ program.ikona.url }}" class="card-img-top" alt="Ikonka {{ program.nazev }}" style="width: 80px; height: 80px; object-fit: contain; margin: 1rem auto 0 auto; display: block;">
-                    {% endif %}
-                </a>
-                <div class="card-body text-center">
-                    <h5 class="card-title">
-                        <a href="{% url 'record' program.pk %}" style="text-decoration: none; color: inherit;">
-                            {{ program.nazev }}
-                        </a>
-                    </h5>
+            {% if program %}
+                <div class="card h-100">
+                    <a href="{% url 'record' program.pk %}">
+                        {% if program.ikona %}
+                        <img src="{{ program.ikona.url }}" class="card-img-top" alt="Ikonka {{ program.nazev }}" style="width: 80px; height: 80px; object-fit: contain; margin: 1rem auto 0 auto; display: block;">
+                        {% endif %}
+                    </a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <a href="{% url 'record' program.pk %}" style="text-decoration: none; color: inherit;">
+                                {{ program.nazev }}
+                            </a>
+                        </h5>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
-        {% endfor %}
+    {% endfor %}
+    <!-- Devátý slot je pro přidání záznamu -->
+<div class="col-md-4 my-3">
+    <div class="d-flex align-items-center justify-content-center" style="min-height: 210px; background: none; border: none;">
+        <a href="{% url 'software_add' %}" class="btn btn-success rounded-pill add-record-btn" style="font-size: 1.3rem; padding: 1.2rem 1.5rem;">
+            Přidat program
+        </a>
     </div>
+</div>
+</div>
 {% endblock %}
