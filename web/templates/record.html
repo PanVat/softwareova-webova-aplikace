@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container my-4">
+        <div class="card mx-auto" style="max-width: 500px;">
+            {% if program.ikona %}
+                <img src="{{ program.ikona.url }}" class="card-img-top" alt="Ikonka {{ program.nazev }}"
+                     style="width: 150px; height: 150px; object-fit: contain; margin: 2rem auto 0 auto; display: block;">
+            {% endif %}
+            <div class="card-body">
+                <h2 class="card-title">{{ program.nazev }}</h2>
+                <p><strong>Kategorie:</strong>
+                    {% for kat in program.kategorie.all %}
+                        {{ kat.nazev }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Popis:</strong> {{ program.popis }}</p>
+                <p><strong>Datum vydání:</strong> {{ program.vydani }}</p>
+                <p><strong>Licence:</strong>
+                    {% for lic in program.licence.all %}
+                        {{ lic.nazev }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Jazyk:</strong>
+                    {% for jaz in program.jazyk.all %}
+                        {% if jaz.vlajka %}
+                            <img src="{{ jaz.vlajka.url }}" alt="{{ jaz.nazev }}" title="{{ jaz.nazev }}"
+                                 style="height: 24px; width: 36px; object-fit: contain; margin-right: 4px;">
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Platforma:</strong>
+                    {% for plat in program.platforma.all %}
+                        {{ plat.nazev }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Cena:</strong> {{ program.cena|default:"0" }} Kč</p>
+                <p><strong>URL:</strong> <a href="{{ program.url }}" target="_blank">{{ program.url }}</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
